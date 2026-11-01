@@ -6,6 +6,13 @@ import urllib.request
 import urllib.parse
 import urllib.error
 
+if sys.platform == "win32":
+    try:
+        sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+        sys.stderr.reconfigure(encoding="utf-8", errors="replace")
+    except Exception:
+        pass
+
 PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 DIST_DIR = os.path.join(PROJECT_ROOT, "dist")
 
@@ -171,7 +178,7 @@ def deploy_to_github(token, repo_name="bubu-dudu-desktop-pet", is_private=True, 
             token=token
         )
 
-    print(f"\n🎉 Source code successfully deployed to: {repo_data['html_url']}")
+    print(f"\n[OK] Source code successfully deployed to: {repo_data['html_url']}")
 
     # 4. Create GitHub Release & Upload Built Binaries
     if upload_releases and os.path.exists(DIST_DIR):
@@ -180,7 +187,7 @@ def deploy_to_github(token, repo_name="bubu-dudu-desktop-pet", is_private=True, 
         release_payload = {
             "tag_name": version_tag,
             "name": f"Bubu & Dudu Pet {version_tag}",
-            "body": "## 🐼🐻 Bubu & Dudu Desktop Pet v1.0.2\n\n- Production-grade cross-platform Electron app for Windows & macOS\n- Real-time hunger, vitality, and 5-minute sleep cycle\n- Dynamic action registry and standalone GIF asset importer\n- Automated GitHub Releases update checker",
+            "body": "## Bubu & Dudu Desktop Pet v1.0.2\n\n- Production-grade cross-platform Electron app for Windows & macOS\n- Real-time hunger, vitality, and 5-minute sleep cycle\n- Dynamic action registry and standalone GIF asset importer\n- Automated GitHub Releases update checker",
             "draft": False,
             "prerelease": False
         }
@@ -230,9 +237,9 @@ def deploy_to_github(token, repo_name="bubu-dudu-desktop-pet", is_private=True, 
         json.dump(pkg, fp, indent=2, ensure_ascii=False)
         fp.write("\n")
 
-    print(f"\n✅ package.json repository updated to: {repo_full}")
+    print(f"\n[OK] package.json repository updated to: {repo_full}")
     print("\n==========================================")
-    print(f"🚀 DEPLOYMENT COMPLETED SUCCESSFULLY!")
+    print(f"[SUCCESS] DEPLOYMENT COMPLETED SUCCESSFULLY!")
     print(f"Repository URL: {repo_data['html_url']} (Private: {repo_data['private']})")
     print(f"Release URL: {repo_data['html_url']}/releases/tag/v1.0.2")
     print("==========================================\n")

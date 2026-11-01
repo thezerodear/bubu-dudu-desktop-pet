@@ -1,0 +1,725 @@
+{
+  "$schema": "./actions.schema.json",
+  "version": "1.0.0",
+  "bubu": {
+    "walk": {
+      "file": "../bubu-walk.gif",
+      "speed": 2.2,
+      "duration": [
+        4000,
+        8000
+      ],
+      "naturalFacing": 1,
+      "label": "Walk (Classic) 🐾",
+      "category": "movement",
+      "menu": true
+    },
+    "walk2": {
+      "file": "../bubu-walking2.gif",
+      "speed": 2.2,
+      "duration": [
+        4000,
+        7000
+      ],
+      "naturalFacing": -1,
+      "label": "Walk (Joyful 2) 🐾",
+      "category": "movement",
+      "menu": true
+    },
+    "walk3": {
+      "file": "../bubu-walking3.gif",
+      "speed": 2.2,
+      "duration": [
+        4000,
+        7000
+      ],
+      "naturalFacing": -1,
+      "label": "Walk (Bounce 3) 🐾",
+      "category": "movement",
+      "menu": true
+    },
+    "skateboard": {
+      "file": "../bubu-skateboard.gif",
+      "speed": 5.5,
+      "duration": [
+        3000,
+        6000
+      ],
+      "naturalFacing": -1,
+      "label": "Skateboard 🛹",
+      "category": "movement",
+      "menu": true
+    },
+    "helicopter": {
+      "file": "../bubu-helicopter.gif",
+      "speed": 2.0,
+      "duration": [
+        5000,
+        8000
+      ],
+      "naturalFacing": 1,
+      "airborne": true,
+      "label": "Helicopter Glide 🚁",
+      "category": "movement",
+      "menu": true
+    },
+    "kickingfeet": {
+      "file": "../bubu-kickingfeet.gif",
+      "speed": 0,
+      "duration": [
+        3500,
+        6000
+      ],
+      "naturalFacing": 1,
+      "label": "Kicking Feet 🦶",
+      "category": "idle",
+      "menu": true
+    },
+    "mousepoint": {
+      "file": "../bubu-mousepointanimation.gif",
+      "speed": 0,
+      "duration": [
+        4000,
+        7000
+      ],
+      "naturalFacing": 1,
+      "label": "Point at Mouse 👆",
+      "category": "idle",
+      "menu": true
+    },
+    "stressing": {
+      "file": "../bubu-stressing.gif",
+      "speed": 0,
+      "duration": [
+        3000,
+        5500
+      ],
+      "naturalFacing": 1,
+      "label": "Stressing / Frustrated 😫",
+      "category": "idle",
+      "menu": true
+    },
+    "walktoward": {
+      "file": "../bubu-walktoward.gif",
+      "speed": 0,
+      "duration": [
+        3000,
+        5000
+      ],
+      "naturalFacing": 1,
+      "label": "Walk Toward 🐾",
+      "category": "movement",
+      "menu": false
+    },
+    "celebrate": {
+      "file": "../bubu-celebrate.gif",
+      "speed": 0,
+      "duration": [
+        3500,
+        6000
+      ],
+      "naturalFacing": 1,
+      "label": "Celebrate 🎉",
+      "category": "idle",
+      "menu": true
+    },
+    "read": {
+      "file": "../bubu-read.gif",
+      "speed": 0,
+      "duration": [
+        4000,
+        9000
+      ],
+      "naturalFacing": 1,
+      "label": "Read Book 📖",
+      "category": "idle",
+      "menu": true
+    },
+    "sus": {
+      "file": "../bubu-sus.gif",
+      "speed": 0,
+      "duration": [
+        3000,
+        6000
+      ],
+      "naturalFacing": 1,
+      "label": "Sus 👀",
+      "category": "idle",
+      "menu": true
+    },
+    "taunt": {
+      "file": "../bubu-taunt.gif",
+      "speed": 0,
+      "duration": [
+        3000,
+        5000
+      ],
+      "naturalFacing": 1,
+      "label": "Taunt 😜",
+      "category": "idle",
+      "menu": true
+    },
+    "crying": {
+      "file": "../bubu-crying.gif",
+      "speed": 0,
+      "duration": [
+        3000,
+        5000
+      ],
+      "naturalFacing": 1,
+      "label": "Crying 😭",
+      "category": "vitality",
+      "menu": true
+    },
+    "sad": {
+      "file": "../bubu-sad.gif",
+      "speed": 0,
+      "duration": [
+        3000,
+        5000
+      ],
+      "naturalFacing": 1,
+      "label": "Sad 🥺",
+      "category": "vitality",
+      "menu": false
+    },
+    "scream": {
+      "file": "../bubu-scream.gif",
+      "speed": 0,
+      "duration": [
+        2500,
+        4500
+      ],
+      "naturalFacing": 1,
+      "label": "Scream 😱",
+      "category": "special",
+      "menu": false
+    },
+    "stressed": {
+      "file": "../bubu-stressed.gif",
+      "speed": 0,
+      "duration": [
+        3000,
+        5000
+      ],
+      "naturalFacing": 1,
+      "label": "Stressed 😣",
+      "category": "idle",
+      "menu": false
+    },
+    "sleep": {
+      "file": "../bubu-sleep.gif",
+      "speed": 0,
+      "duration": [
+        280000,
+        320000
+      ],
+      "naturalFacing": 1,
+      "isSleeping": true,
+      "label": "Sleep (Lay Down) 💤",
+      "category": "vitality",
+      "menu": true
+    },
+    "sitsleep": {
+      "file": "../bubu-sitsleeping.gif",
+      "speed": 0,
+      "duration": [
+        280000,
+        320000
+      ],
+      "naturalFacing": 1,
+      "isSleeping": true,
+      "label": "Sleep (Sit Up) 💤",
+      "category": "vitality",
+      "menu": true
+    },
+    "grabbed": {
+      "file": "../bubu-danggling2.gif",
+      "speed": 0,
+      "duration": [
+        60000,
+        60000
+      ],
+      "naturalFacing": 1,
+      "label": "Dangling (Scruff) 🐾",
+      "category": "special",
+      "menu": true
+    },
+    "grabbed_alt": {
+      "file": "../bubu-grabbed.gif",
+      "speed": 0,
+      "duration": [
+        60000,
+        60000
+      ],
+      "naturalFacing": 1,
+      "label": "Dangling (Flailing) 🐾",
+      "category": "special",
+      "menu": true
+    }
+  },
+  "dudu": {
+    "walk": {
+      "file": "../dudu-walk.gif",
+      "speed": 2.2,
+      "duration": [
+        4000,
+        8000
+      ],
+      "naturalFacing": 1,
+      "label": "Walk (Classic) 🐾",
+      "category": "movement",
+      "menu": true
+    },
+    "walk2": {
+      "file": "../dudu-walking2.gif",
+      "speed": 2.2,
+      "duration": [
+        4000,
+        7000
+      ],
+      "naturalFacing": -1,
+      "label": "Walk (Joyful 2) 🐾",
+      "category": "movement",
+      "menu": true
+    },
+    "angrywalk": {
+      "file": "../dudu-angrywalking.gif",
+      "speed": 2.5,
+      "duration": [
+        3500,
+        6500
+      ],
+      "naturalFacing": 1,
+      "label": "Angry Stomp Walk 😤",
+      "category": "movement",
+      "menu": true
+    },
+    "skateboard": {
+      "file": "../dudu-skateboard.gif",
+      "speed": 5.5,
+      "duration": [
+        3000,
+        6000
+      ],
+      "naturalFacing": -1,
+      "label": "Skateboard 🛹",
+      "category": "movement",
+      "menu": true
+    },
+    "skooter": {
+      "file": "../dudu-skooter.gif",
+      "speed": 4.8,
+      "duration": [
+        3500,
+        7000
+      ],
+      "naturalFacing": 1,
+      "label": "Scooter 🛴",
+      "category": "movement",
+      "menu": true
+    },
+    "dance": {
+      "file": "../dudu-dance.gif",
+      "speed": 0,
+      "duration": [
+        3500,
+        7000
+      ],
+      "naturalFacing": 1,
+      "label": "Dance 💃",
+      "category": "idle",
+      "menu": true
+    },
+    "laugh": {
+      "file": "../dudu-laugh.gif",
+      "speed": 0,
+      "duration": [
+        3000,
+        6000
+      ],
+      "naturalFacing": 1,
+      "label": "Laugh 😆",
+      "category": "idle",
+      "menu": true
+    },
+    "singing": {
+      "file": "../dudu-singing.gif",
+      "speed": 0,
+      "duration": [
+        3500,
+        6500
+      ],
+      "naturalFacing": 1,
+      "label": "Singing 🎤🎵",
+      "category": "idle",
+      "menu": true
+    },
+    "pushup": {
+      "file": "../dudu-pushup.gif",
+      "speed": 0,
+      "duration": [
+        4000,
+        7500
+      ],
+      "naturalFacing": 1,
+      "label": "Push-ups Workout 💪",
+      "category": "idle",
+      "menu": true
+    },
+    "ropeskipping": {
+      "file": "../dudu-ropeskiping.gif",
+      "speed": 0,
+      "duration": [
+        3500,
+        6500
+      ],
+      "naturalFacing": 1,
+      "label": "Jump Rope 🪢",
+      "category": "idle",
+      "menu": true
+    },
+    "peeking": {
+      "file": "../dudu-peekingfromedge.gif",
+      "speed": 0,
+      "duration": [
+        3500,
+        6000
+      ],
+      "naturalFacing": 1,
+      "label": "Peek From Edge 👀",
+      "category": "idle",
+      "menu": true
+    },
+    "mousepoint": {
+      "file": "../dudu-mousepointing.gif",
+      "speed": 0,
+      "duration": [
+        3500,
+        6000
+      ],
+      "naturalFacing": 1,
+      "label": "Point at Mouse 👆",
+      "category": "idle",
+      "menu": true
+    },
+    "read": {
+      "file": "../dudu-read.gif",
+      "speed": 0,
+      "duration": [
+        4000,
+        9000
+      ],
+      "naturalFacing": 1,
+      "label": "Read Book 📖",
+      "category": "idle",
+      "menu": true
+    },
+    "sit_jump": {
+      "file": "../dudu-sit_jump.gif",
+      "speed": 0,
+      "duration": [
+        3500,
+        6000
+      ],
+      "naturalFacing": 1,
+      "label": "Sit & Jump 🪑",
+      "category": "idle",
+      "menu": true
+    },
+    "mad": {
+      "file": "../dudu-mad.gif",
+      "speed": 0,
+      "duration": [
+        3000,
+        5500
+      ],
+      "naturalFacing": 1,
+      "label": "Mad / Angry 😡",
+      "category": "idle",
+      "menu": true
+    },
+    "throwing_bottle": {
+      "file": "../dudu-throwing-bottle.gif",
+      "speed": 0,
+      "duration": [
+        4000,
+        6500
+      ],
+      "naturalFacing": 1,
+      "label": "Throw Bottle 🍾",
+      "category": "idle",
+      "menu": true
+    },
+    "taunt": {
+      "file": "../dudu-taunt.gif",
+      "speed": 0,
+      "duration": [
+        3000,
+        5000
+      ],
+      "naturalFacing": 1,
+      "label": "Taunt 😜",
+      "category": "idle",
+      "menu": true
+    },
+    "denied": {
+      "file": "../dudu-denied touch.gif",
+      "speed": 0,
+      "duration": [
+        3000,
+        5000
+      ],
+      "naturalFacing": 1,
+      "label": "Denied Touch ✋",
+      "category": "idle",
+      "menu": true
+    },
+    "redcard": {
+      "file": "../dudu-redcard.gif",
+      "speed": 0,
+      "duration": [
+        3000,
+        5000
+      ],
+      "naturalFacing": 1,
+      "label": "Red Card 🟥",
+      "category": "idle",
+      "menu": true
+    },
+    "crying": {
+      "file": "../dudu-crying.gif",
+      "speed": 0,
+      "duration": [
+        3000,
+        5000
+      ],
+      "naturalFacing": 1,
+      "label": "Crying 😭",
+      "category": "vitality",
+      "menu": true
+    },
+    "scream": {
+      "file": "../dudu-scream.gif",
+      "speed": 0,
+      "duration": [
+        2500,
+        4500
+      ],
+      "naturalFacing": 1,
+      "label": "Scream 😱",
+      "category": "special",
+      "menu": false
+    },
+    "falling": {
+      "file": "../dudu-falling.gif",
+      "speed": 0,
+      "duration": [
+        30000,
+        30000
+      ],
+      "naturalFacing": 1,
+      "label": "Falling 🪂",
+      "category": "special",
+      "menu": false
+    },
+    "stressed": {
+      "file": "../dudu-stressed.gif",
+      "speed": 0,
+      "duration": [
+        3000,
+        5000
+      ],
+      "naturalFacing": 1,
+      "label": "Stressed 😣",
+      "category": "idle",
+      "menu": false
+    },
+    "sleep": {
+      "file": "../dudu-sleep.gif",
+      "speed": 0,
+      "duration": [
+        280000,
+        320000
+      ],
+      "naturalFacing": 1,
+      "isSleeping": true,
+      "label": "Sleep (Lay Down) 💤",
+      "category": "vitality",
+      "menu": true
+    },
+    "sitsleep": {
+      "file": "../dudu-sitsleeping.gif",
+      "speed": 0,
+      "duration": [
+        280000,
+        320000
+      ],
+      "naturalFacing": 1,
+      "isSleeping": true,
+      "label": "Sleep (Sit Up) 💤",
+      "category": "vitality",
+      "menu": true
+    },
+    "grabbed": {
+      "file": "../dudu-danggling2.gif",
+      "speed": 0,
+      "duration": [
+        60000,
+        60000
+      ],
+      "naturalFacing": 1,
+      "label": "Dangling (Scruff) 🐾",
+      "category": "special",
+      "menu": true
+    },
+    "grabbed_alt": {
+      "file": "../dudu-grabbed.gif",
+      "speed": 0,
+      "duration": [
+        60000,
+        60000
+      ],
+      "naturalFacing": 1,
+      "label": "Dangling (Flailing) 🐾",
+      "category": "special",
+      "menu": true
+    }
+  },
+  "joint": {
+    "kiss": {
+      "id": "kiss",
+      "name": "Kiss 💕",
+      "file": "../dudu-bubu-kiss.gif",
+      "duration": 5800,
+      "emotes": [
+        "❤️",
+        "💖",
+        "🥰",
+        "💋"
+      ]
+    },
+    "highfive": {
+      "id": "highfive",
+      "name": "High Five ✋",
+      "file": "../bubu-dudu-highfive.gif",
+      "duration": 3800,
+      "emotes": [
+        "✋",
+        "⭐",
+        "✨",
+        "🎉"
+      ]
+    },
+    "swinghug": {
+      "id": "swinghug",
+      "name": "Swing Hugging 💕",
+      "file": "../bubu-dudu-swinghugging.gif",
+      "duration": 5000,
+      "emotes": [
+        "💖",
+        "🥰",
+        "💕",
+        "✨"
+      ]
+    },
+    "dragbubu": {
+      "id": "dragbubu",
+      "name": "Playful Dragging 🪢",
+      "file": "../bubu-dudu-bubudragbubu.gif",
+      "duration": 4200,
+      "emotes": [
+        "😄",
+        "💨",
+        "🐾",
+        "😜"
+      ]
+    },
+    "punch": {
+      "id": "punch",
+      "name": "Playful Punch 🥊",
+      "file": "../bubu-dudu-punch.gif",
+      "duration": 4200,
+      "emotes": [
+        "🥊",
+        "💥",
+        "💢",
+        "😜"
+      ]
+    },
+    "throw": {
+      "id": "throw",
+      "name": "Throw Dudu 🤾",
+      "file": "../bubu-dudu-bubuthrowdudu.gif",
+      "duration": 4500,
+      "emotes": [
+        "🤾",
+        "💨",
+        "💫",
+        "🎉"
+      ]
+    },
+    "riding": {
+      "id": "riding",
+      "name": "Ride Bubu 🐼🐻",
+      "file": "../dudu-bubu-playing-riding.gif",
+      "duration": 6500,
+      "emotes": [
+        "❤️",
+        "✨",
+        "🐾",
+        "🥳"
+      ]
+    }
+  },
+  "food": [
+    {
+      "id": "strawberry",
+      "food": "🍓",
+      "icon": "🍓",
+      "name": "สตรอว์เบอร์รี่สด",
+      "hunger": 25,
+      "happiness": 15
+    },
+    {
+      "id": "boba",
+      "food": "🧋",
+      "icon": "🧋",
+      "name": "ชานมไข่มุกหวานละมุน",
+      "hunger": 30,
+      "happiness": 25
+    },
+    {
+      "id": "cake",
+      "food": "🍰",
+      "icon": "🍰",
+      "name": "เค้กช็อกโกแลตสตรอว์เบอร์รี่",
+      "hunger": 35,
+      "happiness": 25
+    },
+    {
+      "id": "onigiri",
+      "food": "🍙",
+      "icon": "🍙",
+      "name": "ข้าวปั้นโอนิกิริ",
+      "hunger": 35,
+      "happiness": 15
+    },
+    {
+      "id": "chicken",
+      "food": "🍗",
+      "icon": "🍗",
+      "name": "น่องไก่ทอดกรอบ",
+      "hunger": 40,
+      "happiness": 20
+    },
+    {
+      "id": "pizza",
+      "food": "🍕",
+      "icon": "🍕",
+      "name": "พิซซ่าชีสเยิ้ม",
+      "hunger": 40,
+      "happiness": 20
+    }
+  ]
+}

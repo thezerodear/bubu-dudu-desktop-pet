@@ -1,0 +1,58 @@
+{
+  "name": "bubu-dudu-desktop-pet",
+  "version": "1.0.2",
+  "description": "Adorable Bubu & Dudu Desktop Pet for Windows and macOS",
+  "main": "src/main.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder",
+    "build:win": "electron-builder --win",
+    "build:mac": "python tools/build_mac.py",
+    "import:gif": "python tools/import_gif.py",
+    "check-update": "node -e \"require('./src/updater').checkForUpdates({ silent: false })\"",
+    "test": "node --test --test-concurrency=1 test/**/*.test.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/theze/bubu-dudu-desktop-pet"
+  },
+  "keywords": [
+    "desktop-pet",
+    "bubu-dudu",
+    "electron",
+    "overlay",
+    "cross-platform"
+  ],
+  "author": "Antigravity",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^40.8.0",
+    "electron-builder": "^26.7.1"
+  },
+  "build": {
+    "appId": "com.bubududu.desktoppet",
+    "productName": "Bubu & Dudu Pet",
+    "files": [
+      "src/**/*",
+      "*.gif",
+      "tray-icon.png",
+      "app-icon.png",
+      "package.json"
+    ],
+    "win": {
+      "target": [
+        "nsis",
+        "portable"
+      ],
+      "icon": "app-icon.ico"
+    },
+    "mac": {
+      "target": [
+        "dmg",
+        "zip"
+      ],
+      "icon": "app-icon.png",
+      "category": "public.app-category.entertainment"
+    }
+  }
+}

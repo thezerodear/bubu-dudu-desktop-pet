@@ -205,7 +205,7 @@ def deploy_to_github(token, repo_name="bubu-dudu-desktop-pet", is_private=True, 
 
         def norm_asset_name(name):
             import re
-            return re.sub(r'[^a-zA-Z0-9._-]', '.', name).lower()
+            return re.sub(r'[^a-zA-Z0-9]+', '.', name).strip('.').lower()
 
         existing_assets = {norm_asset_name(a["name"]): a for a in release_data.get("assets", [])}
 
@@ -233,8 +233,14 @@ def deploy_to_github(token, repo_name="bubu-dudu-desktop-pet", is_private=True, 
                 asset_bytes = f.read()
 
             upload_url = f"{upload_url_template}?name={urllib.parse.quote(df)}"
-            make_request(upload_url, method="POST", data=asset_bytes, token=token, content_type="application/octet-stream")
-            print(f"  Successfully uploaded {df}!")
+            try:
+                make_request(upload_url, method="POST", data=asset_bytes, token=token, content_type="application/octet-stream")
+                print(f"  Successfully uploaded {df}!")
+            except RuntimeError as e:
+                if "already_exists" in str(e):
+                    print(f"  Asset {df} already exists in release (verified).")
+                else:
+                    raise
 
     # 5. Update package.json with the repository URL
     pkg_path = os.path.join(PROJECT_ROOT, "package.json")

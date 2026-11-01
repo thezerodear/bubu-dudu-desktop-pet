@@ -7,6 +7,8 @@ import zipfile
 import copy
 import plistlib
 
+import json
+
 CACHE_DIR = os.path.join(os.path.dirname(__file__), "cache")
 DIST_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "dist"))
 PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
@@ -16,7 +18,9 @@ APP_DISPLAY_NAME = "Bubu & Dudu Pet"
 APP_BUNDLE_FOLDER = "Bubu & Dudu Pet.app"
 APP_EXEC_NAME = "BubuAndDuduPet"
 BUNDLE_ID = "com.bubududu.desktoppet"
-VERSION = "1.0.2"
+
+with open(os.path.join(PROJECT_ROOT, "package.json"), "r", encoding="utf-8") as _fp:
+    VERSION = json.load(_fp).get("version", "1.0.3")
 
 MAC_README_TEXT = f"""# วิธีเปิดใช้งาน Bubu & Dudu Pet บน macOS (Sonoma 14+ / Ventura / Monterey)
 

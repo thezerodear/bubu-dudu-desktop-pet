@@ -1,6 +1,6 @@
 {
   "name": "bubu-dudu-desktop-pet",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Adorable Bubu & Dudu Desktop Pet for Windows and macOS",
   "main": "src/main.js",
   "scripts": {

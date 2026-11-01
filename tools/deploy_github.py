@@ -183,11 +183,16 @@ def deploy_to_github(token, repo_name="bubu-dudu-desktop-pet", is_private=True, 
     # 4. Create GitHub Release & Upload Built Binaries
     if upload_releases and os.path.exists(DIST_DIR):
         print("\n--- Publishing Release & Distribution Assets ---")
-        version_tag = "v1.0.2"
+        pkg_path = os.path.join(PROJECT_ROOT, "package.json")
+        with open(pkg_path, "r", encoding="utf-8") as fp:
+            pkg_data = json.load(fp)
+        pkg_version = pkg_data.get("version", "1.0.3")
+        version_tag = f"v{pkg_version}"
+
         release_payload = {
             "tag_name": version_tag,
             "name": f"Bubu & Dudu Pet {version_tag}",
-            "body": "## Bubu & Dudu Desktop Pet v1.0.2\n\n- Production-grade cross-platform Electron app for Windows & macOS\n- Real-time hunger, vitality, and 5-minute sleep cycle\n- Dynamic action registry and standalone GIF asset importer\n- Automated GitHub Releases update checker",
+            "body": f"## Bubu & Dudu Desktop Pet {version_tag}\n\n- Fixed Bubu Joyful Walk 2 direction (faces forward naturally)\n- Full English localization for thoughts, menus, and update dialogs\n- Built-in GitHub Private Repository auto-update support\n- macOS Sonoma Gatekeeper & architecture support (Intel & Apple Silicon)",
             "draft": False,
             "prerelease": False
         }
@@ -209,7 +214,7 @@ def deploy_to_github(token, repo_name="bubu-dudu-desktop-pet", is_private=True, 
 
         existing_assets = {norm_asset_name(a["name"]): a for a in release_data.get("assets", [])}
 
-        dist_files = [f for f in os.listdir(DIST_DIR) if "1.0.2" in f and not f.endswith(".blockmap")]
+        dist_files = [f for f in os.listdir(DIST_DIR) if pkg_version in f and not f.endswith(".blockmap")]
         for df in dist_files:
             file_path = os.path.join(DIST_DIR, df)
             if not os.path.isfile(file_path):

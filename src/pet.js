@@ -20,7 +20,7 @@ const IDLE_SLEEP_TIMEOUT = 120000; // 2 minutes idle before taking a nap
 
 // Tamagotchi Needs & Vitality System
 let petStats = {
-  hunger: 80,     // 0 - 100 (100 = full/อิ่ม, 0 = starving)
+  hunger: 80,     // 0 - 100 (100 = full, 0 = starving)
   energy: 90,     // 0 - 100 (decreases while moving, restores during sleep)
   happiness: 95,  // 0 - 100 (increases with food, petting, couple activities)
   sleepStartTime: null
@@ -152,7 +152,7 @@ function setAction(actionName, customDuration = null) {
       if (currentAction === 'sleep' || currentAction === 'sitsleep') {
         petStats.energy = 100;
         petStats.happiness = Math.min(100, petStats.happiness + 25);
-        spawnThoughtBubble('✨ ตื่นแล้ว! หลับเต็มอิ่ม (พลัง 100% ⚡)');
+        spawnThoughtBubble('✨ Wide awake! Fully refreshed (Energy 100% ⚡)');
         spawnEmote('✨');
         setTimeout(() => spawnEmote('🥰'), 500);
         setAction(petName === 'bubu' ? 'celebrate' : 'dance', 3800);
@@ -193,7 +193,7 @@ function resetIdleTimer() {
   if (idleTimer) clearTimeout(idleTimer);
   idleTimer = setTimeout(() => {
     if (!isDragging && !isFalling && !isGliding && !isJointActionActive && currentAction !== 'sleep' && currentAction !== 'sitsleep') {
-      spawnThoughtBubble('💤 ง่วงนอนแล้วจ้า... ขอหลับแป๊บนึงน้า');
+      spawnThoughtBubble('💤 So sleepy... Time for a little nap 😴');
       setAction(Math.random() < 0.5 ? 'sleep' : 'sitsleep');
     }
   }, IDLE_SLEEP_TIMEOUT);
@@ -204,7 +204,7 @@ function pickNextAutonomousAction() {
 
   // If energy is depleted (<15), take a natural 5-minute nap
   if (petStats.energy <= 15) {
-    spawnThoughtBubble('💤 พลังงานหมดแล้ว...ของีบสัก 5 นาทีนะ');
+    spawnThoughtBubble('💤 Out of energy... Taking a 5-min nap 😴');
     setAction(Math.random() < 0.5 ? 'sleep' : 'sitsleep');
     return;
   }
@@ -212,7 +212,7 @@ function pickNextAutonomousAction() {
   // If very hungry (<20), show hunger mood
   if (petStats.hunger <= 20 && Math.random() < 0.45) {
     spawnEmote('🥺');
-    spawnThoughtBubble('หิวม๊ากกก 🍙 หิวจนตาลายแย้ว~');
+    spawnThoughtBubble('So hungry... 🍙 Tummy is rumbling~');
     setAction(petName === 'bubu' ? 'sad' : 'crying', 3500);
     return;
   }
@@ -432,7 +432,7 @@ function spawnFoodDrop(emoji, hungerBonus) {
 
   const stat = document.createElement('div');
   stat.className = 'float-stat';
-  stat.textContent = `+${hungerBonus} ${emoji} อร่อยจัง!`;
+  stat.textContent = `+${hungerBonus} ${emoji} Yummy!`;
   emoteLayer.appendChild(stat);
   setTimeout(() => stat.remove(), 1800);
 }
@@ -449,7 +449,7 @@ function handlePoke() {
 
   if (currentAction === 'sleep' || currentAction === 'sitsleep') {
     spawnEmote('❗');
-    spawnThoughtBubble('อื้ออ... โดนสะกิดตื่นเยย 😴');
+    spawnThoughtBubble('Mmm... Did someone poke me awake? 😴');
     setAction(petName === 'bubu' ? 'sus' : 'scream', 2500);
     return;
   }
@@ -482,13 +482,13 @@ function feedPet(foodData) {
 
   if (currentAction === 'sleep' || currentAction === 'sitsleep') {
     spawnEmote('😋');
-    spawnThoughtBubble(`งั่มๆ ได้กลิ่น ${name}! ตื่นมากินก่อน 😋`);
+    spawnThoughtBubble(`Yum! Smelled ${name}! Woke up to eat 😋`);
     setAction(petName === 'bubu' ? 'celebrate' : 'dance', 3500);
   } else {
     spawnEmote('😋');
     setTimeout(() => spawnEmote('💖'), 400);
     setTimeout(() => spawnEmote('✨'), 800);
-    spawnThoughtBubble(`งั่มๆ ${name} อร่อยมาก! (อิ่ม ${Math.round(petStats.hunger)}%)`);
+    spawnThoughtBubble(`Nom nom, ${name} is delicious! (Full: ${Math.round(petStats.hunger)}%)`);
     setAction(petName === 'bubu' ? 'celebrate' : (Math.random() < 0.5 ? 'dance' : 'laugh'), 3500);
   }
 
@@ -496,7 +496,7 @@ function feedPet(foodData) {
 }
 
 // Tamagotchi Needs Engine: Updates every 12 seconds
-const FOOD_CRAVINGS = ['🍙 ข้าวปั้น', '🧋 ชานมไข่มุก', '🍓 สตรอว์เบอร์รี่', '🍰 เค้กหวานๆ', '🍗 น่องไก่', '🍕 พิซซ่า'];
+const FOOD_CRAVINGS = ['🍙 Onigiri', '🧋 Bubble Tea', '🍓 Strawberry', '🍰 Sweet Cake', '🍗 Chicken Drumstick', '🍕 Pizza'];
 function updatePetNeeds() {
   const isSleeping = currentAction === 'sleep' || currentAction === 'sitsleep';
 
@@ -512,7 +512,7 @@ function updatePetNeeds() {
     // If hungry, show craving thought bubble
     if (petStats.hunger <= 35 && Math.random() < 0.45 && !isDragging && !isFalling && !isGliding) {
       const craving = FOOD_CRAVINGS[Math.floor(Math.random() * FOOD_CRAVINGS.length)];
-      spawnThoughtBubble(`💭 หิวจังเลย อยากกิน${craving}~`);
+      spawnThoughtBubble(`💭 Hungry... Craving ${craving}~`);
     }
 
     // If starving, lower happiness
@@ -722,14 +722,14 @@ window.electronAPI.onFeedPet((data) => {
 });
 
 window.electronAPI.onPutToSleep((duration) => {
-  spawnThoughtBubble('💤 ขอตัวไปนอนพักสัก 5 นาทีนะงับ...');
+  spawnThoughtBubble('💤 Taking a cozy 5-minute nap... 😴');
   setAction(Math.random() < 0.5 ? 'sleep' : 'sitsleep', duration || 300000);
 });
 
 window.electronAPI.onWakeUpPet(() => {
   if (currentAction === 'sleep' || currentAction === 'sitsleep') {
     spawnEmote('⏰');
-    spawnThoughtBubble('ตื่นแล้วค้าบบบ! ☀️');
+    spawnThoughtBubble("Good morning! I'm awake! ☀️");
     setAction(petName === 'bubu' ? 'celebrate' : 'dance', 3500);
   }
 });

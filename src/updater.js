@@ -363,9 +363,9 @@ async function checkForUpdates(options = {}) {
         dialog.showMessageBox({
           type: 'info',
           title: 'Bubu & Dudu Pet',
-          message: `คุณกำลังใช้เวอร์ชันล่าสุดแล้ว! (v${currentVersion})`,
-          detail: 'น้องๆ Bubu และ Dudu สดชื่นและพร้อมเล่นอยู่เสมอ ไม่มีอัปเดตใหม่ในขณะนี้ ✨',
-          buttons: ['ตกลง']
+          message: `You are on the latest version! (v${currentVersion})`,
+          detail: 'Bubu & Dudu are fresh, happy, and ready to play! No updates needed ✨',
+          buttons: ['OK']
         });
       }
     }
@@ -388,9 +388,9 @@ async function checkForUpdates(options = {}) {
         const choice = await dialog.showMessageBox({
           type: 'warning',
           title: 'Bubu & Dudu Pet - GitHub Update',
-          message: 'Repository นี้เป็นแบบส่วนตัว (Private)',
-          detail: 'ไม่สามารถเข้าถึง GitHub Release ได้เนื่องจากยังไม่ได้ระบุ GitHub Token หรือ Token หมดอายุ\n\nต้องการตั้งค่า GitHub Token ตอนนี้หรือไม่?',
-          buttons: ['ตั้งค่า Token 🔑', 'ไว้ภายหลัง']
+          message: 'Private GitHub Repository',
+          detail: 'Unable to access GitHub Releases because no GitHub Token is configured or the token has expired.\n\nWould you like to configure your GitHub Token now?',
+          buttons: ['Configure Token 🔑', 'Later']
         });
         if (choice.response === 0) {
           await promptTokenConfigDialog();
@@ -399,9 +399,9 @@ async function checkForUpdates(options = {}) {
         dialog.showMessageBox({
           type: 'warning',
           title: 'Bubu & Dudu Pet Update',
-          message: 'ไม่สามารถตรวจสอบการอัปเดตได้ในขณะนี้',
-          detail: `ข้อผิดพลาด: ${err.message}\n(ตรวจสอบการเชื่อมต่ออินเทอร์เน็ต หรือลองใหม่อีกครั้งในภายหลัง)`,
-          buttons: ['ตกลง']
+          message: 'Unable to check for updates at this time',
+          detail: `Error: ${err.message}\n(Please check your network connection or try again later)`,
+          buttons: ['OK']
         });
       }
     }
@@ -417,14 +417,14 @@ async function promptUpdateDialog(release, currentVersion) {
   if (!dialog) return;
 
   const tag = release.tag_name || 'New Version';
-  const notes = (release.body || 'มีการปรับปรุงและเพิ่มฟีเจอร์ใหม่').slice(0, 500);
+  const notes = (release.body || 'New features and improvements').slice(0, 500);
 
   const result = await dialog.showMessageBox({
     type: 'question',
-    title: '🎉 พบอัปเดตใหม่สำหรับ Bubu & Dudu Pet!',
-    message: `เวอร์ชันใหม่ ${tag} พร้อมให้ใช้งานแล้ว! (เวอร์ชันปัจจุบัน: v${currentVersion})`,
-    detail: `${notes}\n\nต้องการดาวน์โหลดและติดตั้งทันทีหรือไม่?`,
-    buttons: ['ดาวน์โหลดและอัปเดต 📥', 'เปิดดูบน GitHub 🌐', 'ไว้ภายหลัง ❌'],
+    title: '🎉 New Update Available for Bubu & Dudu Pet!',
+    message: `New version ${tag} is ready! (Current version: v${currentVersion})`,
+    detail: `${notes}\n\nWould you like to download and install now?`,
+    buttons: ['Download & Update 📥', 'View on GitHub 🌐', 'Later ❌'],
     defaultId: 0,
     cancelId: 2,
   });
@@ -445,14 +445,14 @@ async function promptTokenConfigDialog() {
   if (!dialog) return;
 
   const currentToken = getAuthToken();
-  const masked = currentToken ? (currentToken.slice(0, 7) + '...' + currentToken.slice(-4)) : 'ยังไม่ได้ตั้งค่า';
+  const masked = currentToken ? (currentToken.slice(0, 7) + '...' + currentToken.slice(-4)) : 'Not configured';
 
   const res = await dialog.showMessageBox({
     type: 'info',
-    title: 'ตั้งค่า GitHub Token สำหรับ Auto-Update 🔑',
-    message: `สถานะ Token ปัจจุบัน: ${masked}`,
-    detail: `ระบบรองรับการอ่าน Token อัตโนมัติจาก:\n1. ไฟล์ updater.config.json\n2. ตัวแปรสภาพแวดล้อม GITHUB_TOKEN\n\nต้องการเปิดโฟลเดอร์ตั้งค่าเพื่อตรวจสอบ/แก้ไขไฟล์ updater.config.json หรือไม่?`,
-    buttons: ['เปิดโฟลเดอร์ตั้งค่า 📁', 'เปิดหน้าสร้าง Token บน GitHub 🌐', 'ปิด']
+    title: 'Configure GitHub Token for Auto-Updates 🔑',
+    message: `Current Token Status: ${masked}`,
+    detail: `The system automatically loads tokens from:\n1. updater.config.json in app directory\n2. GITHUB_TOKEN environment variable\n\nWould you like to open the configuration folder or generate a token on GitHub?`,
+    buttons: ['Open Config Folder 📁', 'Generate Token on GitHub 🌐', 'Close']
   });
 
   if (res.response === 0) {
@@ -500,10 +500,10 @@ async function performDownloadAndInstall(release, onProgress = null) {
   if (dialog) {
     dialog.showMessageBox({
       type: 'info',
-      title: 'กำลังดาวน์โหลดอัปเดต 📥',
-      message: `กำลังดาวน์โหลด ${asset.name}...`,
-      detail: 'ระบบกำลังดาวน์โหลดไฟล์อัปเดตในเบื้องหลัง เมื่อเสร็จสิ้นจะเปิดตัวติดตั้งให้อัตโนมัติครับ ✨',
-      buttons: ['รับทราบ']
+      title: 'Downloading Update 📥',
+      message: `Downloading ${asset.name}...`,
+      detail: 'Downloading update in background. The installer will launch automatically once finished ✨',
+      buttons: ['OK']
     });
   }
 
@@ -513,9 +513,9 @@ async function performDownloadAndInstall(release, onProgress = null) {
     if (process.platform === 'win32') {
       const confirm = await dialog.showMessageBox({
         type: 'info',
-        title: 'ดาวน์โหลดเสร็จสมบูรณ์ 🎉',
-        message: 'ดาวน์โหลดเวอร์ชันใหม่เสร็จแล้ว พร้อมติดตั้งทันที!',
-        buttons: ['ติดตั้งและเริ่มแอปใหม่ 🚀', 'ไว้เปิดเองภายหลัง']
+        title: 'Download Complete 🎉',
+        message: 'New version downloaded successfully and ready to install!',
+        buttons: ['Install & Restart 🚀', 'Later']
       });
 
       if (confirm.response === 0) {
@@ -529,10 +529,10 @@ async function performDownloadAndInstall(release, onProgress = null) {
       if (dialog) {
         dialog.showMessageBox({
           type: 'info',
-          title: 'ดาวน์โหลดเสร็จสมบูรณ์ 🎉',
-          message: 'ดาวน์โหลดเวอร์ชันใหม่เสร็จแล้ว!',
-          detail: `ไฟล์อยู่ที่: ${destPath}\nเปิดไฟล์เพื่อแทนที่แอปในโฟลเดอร์ Applications ได้ทันที ✨`,
-          buttons: ['ตกลง']
+          title: 'Download Complete 🎉',
+          message: 'New version downloaded successfully!',
+          detail: `File saved at: ${destPath}\nOpen file to replace app in Applications folder ✨`,
+          buttons: ['OK']
         });
       }
     }
@@ -541,10 +541,10 @@ async function performDownloadAndInstall(release, onProgress = null) {
     if (dialog) {
       dialog.showMessageBox({
         type: 'error',
-        title: 'การดาวน์โหลดล้มเหลว',
-        message: 'ไม่สามารถดาวน์โหลดไฟล์อัปเดตได้',
-        detail: `${err.message}\nจะเปิดหน้าดาวน์โหลด Release บนเบราว์เซอร์แทนครับ`,
-        buttons: ['ตกลง']
+        title: 'Download Failed',
+        message: 'Unable to download update file',
+        detail: `${err.message}\nOpening release page in browser instead.`,
+        buttons: ['OK']
       });
     }
     if (shell && release.html_url) {

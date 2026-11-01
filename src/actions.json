@@ -677,7 +677,7 @@
       "id": "strawberry",
       "food": "🍓",
       "icon": "🍓",
-      "name": "สตรอว์เบอร์รี่สด",
+      "name": "Fresh Strawberry",
       "hunger": 25,
       "happiness": 15
     },
@@ -685,7 +685,7 @@
       "id": "boba",
       "food": "🧋",
       "icon": "🧋",
-      "name": "ชานมไข่มุกหวานละมุน",
+      "name": "Bubble Milk Tea",
       "hunger": 30,
       "happiness": 25
     },
@@ -693,7 +693,7 @@
       "id": "cake",
       "food": "🍰",
       "icon": "🍰",
-      "name": "เค้กช็อกโกแลตสตรอว์เบอร์รี่",
+      "name": "Strawberry Cake",
       "hunger": 35,
       "happiness": 25
     },
@@ -701,7 +701,7 @@
       "id": "onigiri",
       "food": "🍙",
       "icon": "🍙",
-      "name": "ข้าวปั้นโอนิกิริ",
+      "name": "Onigiri Rice Ball",
       "hunger": 35,
       "happiness": 15
     },
@@ -709,7 +709,7 @@
       "id": "chicken",
       "food": "🍗",
       "icon": "🍗",
-      "name": "น่องไก่ทอดกรอบ",
+      "name": "Crispy Chicken Drumstick",
       "hunger": 40,
       "happiness": 20
     },
@@ -717,7 +717,7 @@
       "id": "pizza",
       "food": "🍕",
       "icon": "🍕",
-      "name": "พิซซ่าชีสเยิ้ม",
+      "name": "Cheesy Pizza Slice",
       "hunger": 40,
       "happiness": 20
     }

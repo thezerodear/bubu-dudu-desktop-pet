@@ -31,12 +31,12 @@ let petStats = {
 };
 
 const FOOD_MENU = [
-  { food: '🍓', name: 'สตรอว์เบอร์รี่สด', hunger: 25, happiness: 15 },
-  { food: '🧋', name: 'ชานมไข่มุกหวานละมุน', hunger: 30, happiness: 25 },
-  { food: '🍰', name: 'เค้กช็อกโกแลตสตรอว์เบอร์รี่', hunger: 35, happiness: 25 },
-  { food: '🍙', name: 'ข้าวปั้นโอนิกิริ', hunger: 35, happiness: 15 },
-  { food: '🍗', name: 'น่องไก่ทอดกรอบ', hunger: 40, happiness: 20 },
-  { food: '🍕', name: 'พิซซ่าชีสเยิ้ม', hunger: 40, happiness: 20 },
+  { food: '🍓', name: 'Fresh Strawberry', hunger: 25, happiness: 15 },
+  { food: '🧋', name: 'Bubble Milk Tea', hunger: 30, happiness: 25 },
+  { food: '🍰', name: 'Strawberry Cake', hunger: 35, happiness: 25 },
+  { food: '🍙', name: 'Onigiri Rice Ball', hunger: 35, happiness: 15 },
+  { food: '🍗', name: 'Crispy Chicken Drumstick', hunger: 40, happiness: 20 },
+  { food: '🍕', name: 'Cheesy Pizza Slice', hunger: 40, happiness: 20 },
 ];
 
 let jointActionInProgress = false;
@@ -157,7 +157,7 @@ function buildFoodSubmenu(targetWindow = null, defaultPet = 'bubu') {
   const foodList = getFoodList();
 
   return foodList.map(item => ({
-    label: `${item.food || item.icon || '🍽️'} ${item.name} (+${item.hunger} หิว)`,
+    label: `${item.food || item.icon || '🍽️'} ${item.name} (+${item.hunger} hunger)`,
     click: () => {
       const win = targetWindow || (defaultPet === 'bubu' ? bubuWindow : duduWindow);
       if (win && !win.isDestroyed()) {
@@ -385,29 +385,29 @@ function updateTrayMenu() {
 
   if (updateInfo.hasUpdate) {
     menuItems.push({
-      label: `⭐ มีอัปเดตใหม่: ${updateInfo.latestVersion} (คลิกเพื่อติดตั้ง)`,
+      label: `⭐ New Update Available: ${updateInfo.latestVersion} (Click to Install)`,
       click: () => updater.promptUpdateDialog(updateInfo.release, app ? app.getVersion() : '1.0.2')
     }, { type: 'separator' });
   }
 
   menuItems.push(
     {
-      label: 'ให้อาหารน้อง Bubu 🍓',
+      label: 'Feed Bubu 🍓',
       submenu: buildFoodSubmenu(bubuWindow, 'bubu')
     },
     {
-      label: 'ให้อาหารน้อง Dudu 🍗',
+      label: 'Feed Dudu 🍗',
       submenu: buildFoodSubmenu(duduWindow, 'dudu')
     },
     {
-      label: 'ให้น้องนอนพัก 5 นาที 💤',
+      label: 'Take a 5-min Nap 💤',
       click: () => {
         bubuWindow?.webContents.send('put-to-sleep', 300000);
         duduWindow?.webContents.send('put-to-sleep', 300000);
       }
     },
     {
-      label: 'ปลุกน้องทั้งสอง ⏰',
+      label: 'Wake Up Both Pets ⏰',
       click: () => {
         bubuWindow?.webContents.send('wake-up-pet');
         duduWindow?.webContents.send('wake-up-pet');
@@ -492,11 +492,11 @@ function updateTrayMenu() {
       click: resetPositions
     },
     {
-      label: 'ตรวจหาอัปเดต... (Check for Updates 🔄)',
+      label: 'Check for Updates 🔄',
       click: () => updater.checkForUpdates({ silent: false })
     },
     {
-      label: 'ตั้งค่า GitHub Token 🔑',
+      label: 'Configure GitHub Token 🔑',
       click: () => updater.promptTokenConfigDialog()
     },
     { type: 'separator' },
@@ -573,21 +573,21 @@ ipcMain.on('open-context-menu', (event, petName) => {
 
   const isBubu = petName === 'bubu';
   const stats = petStats[petName] || { hunger: 80, energy: 90, happiness: 95 };
-  const statusIcon = stats.isSleeping ? '💤 กำลังหลับสบาย' : (stats.hunger < 35 ? '🥺 หิวงับ' : '✨ ร่าเริง');
+  const statusIcon = stats.isSleeping ? '💤 Sleeping peacefully' : (stats.hunger < 35 ? '🥺 Hungry' : '✨ Happy');
 
   const menu = Menu.buildFromTemplate([
     { label: `${isBubu ? '🐼 Bubu' : '🐻 Dudu'} (🍗 ${stats.hunger}% | ⚡ ${stats.energy}% | ${statusIcon})`, enabled: false },
     { type: 'separator' },
     {
-      label: `ให้อาหาร (${isBubu ? 'Feed Bubu' : 'Feed Dudu'} 🍽️)`,
+      label: `Feed Pet (${isBubu ? 'Feed Bubu' : 'Feed Dudu'} 🍽️)`,
       submenu: buildFoodSubmenu(win, petName)
     },
     {
-      label: 'ให้น้องนอนพัก 5 นาที 💤',
+      label: 'Take a 5-min Nap 💤',
       click: () => win.webContents.send('put-to-sleep', 300000)
     },
     {
-      label: 'ปลุกน้อง ⏰',
+      label: 'Wake Up ⏰',
       click: () => win.webContents.send('wake-up-pet')
     },
     { type: 'separator' },
@@ -669,8 +669,8 @@ if (isElectron && app) {
     updater.onUpdateStatus((status) => {
       updateTrayMenu();
       if (status.hasUpdate) {
-        bubuWindow?.webContents.send('thought-bubble', `⭐ มีอัปเดตใหม่ ${status.latestVersion}! คลิกที่ไอคอนถาดระบบเพื่ออัปเดตได้เลย ✨`);
-        duduWindow?.webContents.send('thought-bubble', `⭐ มีอัปเดตใหม่ ${status.latestVersion}! ✨`);
+        bubuWindow?.webContents.send('thought-bubble', `⭐ New update ${status.latestVersion} available! Click tray icon to update ✨`);
+        duduWindow?.webContents.send('thought-bubble', `⭐ New update ${status.latestVersion} available! ✨`);
       }
     });
 

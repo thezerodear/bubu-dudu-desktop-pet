@@ -33,7 +33,7 @@ const emoteLayer = document.getElementById('emote-layer');
 // naturalFacing: -1 indicates the raw GIF artwork faces LEFT by default
 const BUBU_ACTIONS = {
   walk: { file: '../bubu-walk.gif', speed: 2.2, duration: [4000, 8000], naturalFacing: 1 },
-  walk2: { file: '../bubu-walking2.gif', speed: 2.2, duration: [4000, 7000], naturalFacing: -1 },
+  walk2: { file: '../bubu-walking2.gif', speed: 2.2, duration: [4000, 7000], naturalFacing: 1 },
   walk3: { file: '../bubu-walking3.gif', speed: 2.2, duration: [4000, 7000], naturalFacing: -1 },
   skateboard: { file: '../bubu-skateboard.gif', speed: 5.5, duration: [3000, 6000], naturalFacing: -1 },
   helicopter: { file: '../bubu-helicopter.gif', speed: 2.0, duration: [5000, 8000], airborne: true, naturalFacing: 1 },

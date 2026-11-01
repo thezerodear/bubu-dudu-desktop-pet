@@ -221,11 +221,11 @@ def deploy_to_github(token, repo_name="bubu-dudu-desktop-pet", is_private=True, 
             # If asset already uploaded with matching size, skip re-upload
             if norm_df in existing_assets:
                 remote_size = existing_assets[norm_df].get("size", 0)
-                if remote_size == local_size:
+                if remote_size == local_size and not os.environ.get("FORCE_REUPLOAD"):
                     print(f"Asset {df} ({local_size / 1024 / 1024:.1f} MB) already up to date in release, skipping.")
                     continue
                 else:
-                    print(f"Removing prior asset {df} (size mismatch)...")
+                    print(f"Removing prior asset {df}...")
                     make_request(f"{repo_url}/releases/assets/{existing_assets[norm_df]['id']}", method="DELETE", token=token)
 
             print(f"Uploading asset {df} ({local_size / 1024 / 1024:.1f} MB)...", flush=True)

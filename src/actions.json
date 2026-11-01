@@ -21,7 +21,7 @@
         4000,
         7000
       ],
-      "naturalFacing": -1,
+      "naturalFacing": 1,
       "label": "Walk (Joyful 2) 🐾",
       "category": "movement",
       "menu": true

@@ -5,6 +5,7 @@
  */
 
 const https = require('https');
+const http = require('http');
 const fs = require('fs');
 const path = require('path');
 const { spawn } = require('child_process');
@@ -19,8 +20,8 @@ try {
 const isElectron = typeof electron === 'object' && electron !== null && typeof electron.app !== 'undefined';
 const { app, dialog, shell } = isElectron ? electron : {};
 
-// Default repository fallback if not specified in package.json
-const DEFAULT_REPO = 'bubu-dudu/bubu-dudu-desktop-pet';
+// Default repository target
+const DEFAULT_REPO = 'thezerodear/bubu-dudu-desktop-pet';
 
 let updateState = {
   checking: false,
@@ -65,18 +66,83 @@ function isNewerVersion(remote, local) {
 
 /**
  * Checks for GitHub authentication token (for private repositories).
+ * Searches in environment variables, userData, working directory, and app paths.
  */
 function getAuthToken() {
-  if (process.env.GITHUB_TOKEN) return process.env.GITHUB_TOKEN.trim();
-  if (process.env.GH_TOKEN) return process.env.GH_TOKEN.trim();
-  try {
-    const configPath = path.join(__dirname, '..', 'updater.config.json');
-    if (fs.existsSync(configPath)) {
-      const cfg = JSON.parse(fs.readFileSync(configPath, 'utf8'));
-      if (cfg && cfg.token) return cfg.token.trim();
+  if (process.env.GITHUB_TOKEN && process.env.GITHUB_TOKEN.trim()) {
+    return process.env.GITHUB_TOKEN.trim();
+  }
+  if (process.env.GH_TOKEN && process.env.GH_TOKEN.trim()) {
+    return process.env.GH_TOKEN.trim();
+  }
+
+  const candidatePaths = [
+    path.join(__dirname, '..', 'updater.config.json'),
+    path.join(process.cwd(), 'updater.config.json'),
+  ];
+
+  if (isElectron && app && typeof app.getPath === 'function') {
+    try {
+      candidatePaths.push(path.join(app.getPath('userData'), 'updater.config.json'));
+    } catch (e) {}
+  }
+
+  if (process.execPath) {
+    try {
+      candidatePaths.push(path.join(path.dirname(process.execPath), 'updater.config.json'));
+    } catch (e) {}
+  }
+
+  if (process.resourcesPath) {
+    try {
+      candidatePaths.push(path.join(process.resourcesPath, 'updater.config.json'));
+    } catch (e) {}
+  }
+
+  for (const configPath of candidatePaths) {
+    try {
+      if (fs.existsSync(configPath)) {
+        const cfg = JSON.parse(fs.readFileSync(configPath, 'utf8'));
+        if (cfg && cfg.token && typeof cfg.token === 'string' && cfg.token.trim()) {
+          return cfg.token.trim();
+        }
+      }
+    } catch (e) {
+      // Ignore reading error
     }
-  } catch (e) {}
+  }
+
   return null;
+}
+
+/**
+ * Saves GitHub authentication token to configuration files.
+ */
+function saveAuthToken(token, repo = null) {
+  const data = {
+    token: (token || '').trim(),
+    repository: repo || getRepoIdentifier(),
+    updatedAt: new Date().toISOString()
+  };
+
+  const targets = [];
+  if (isElectron && app && typeof app.getPath === 'function') {
+    try {
+      targets.push(path.join(app.getPath('userData'), 'updater.config.json'));
+    } catch (e) {}
+  }
+  targets.push(path.join(__dirname, '..', 'updater.config.json'));
+
+  let saved = false;
+  for (const target of targets) {
+    try {
+      const dir = path.dirname(target);
+      if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+      fs.writeFileSync(target, JSON.stringify(data, null, 2), 'utf8');
+      saved = true;
+    } catch (e) {}
+  }
+  return saved;
 }
 
 /**
@@ -126,9 +192,9 @@ function findPlatformAsset(assets, platform = process.platform, arch = process.a
     const anyExe = assets.find(a => a.name && a.name.endsWith('.exe') && !a.name.endsWith('.blockmap'));
     if (anyExe) return anyExe;
   } else if (platform === 'darwin') {
-    const archKey = arch === 'arm64' ? 'arm64' : 'x64';
+    const archKey = (arch === 'arm64' || arch === 'aarch64') ? 'arm64' : 'x64';
     // Match matching arch zip or dmg
-    const matched = assets.find(a => a.name && (a.name.endsWith('.zip') || a.name.endsWith('.dmg')) && a.name.includes(archKey));
+    const matched = assets.find(a => a.name && (a.name.endsWith('.zip') || a.name.endsWith('.dmg')) && a.name.toLowerCase().includes(archKey));
     if (matched) return matched;
     // Fallback: any mac zip
     const anyMac = assets.find(a => a.name && (a.name.endsWith('.zip') || a.name.endsWith('.dmg')) && a.name.toLowerCase().includes('mac'));
@@ -139,7 +205,8 @@ function findPlatformAsset(assets, platform = process.platform, arch = process.a
 }
 
 /**
- * Makes an HTTPS GET request and follows redirects (e.g. for GitHub release asset downloads).
+ * Makes an HTTPS/HTTP GET request and follows redirects (e.g. for GitHub release asset downloads).
+ * Automatically handles GitHub authorization token and strips it when redirecting to external storage (S3).
  */
 function httpsGetWithRedirects(url, headers = {}, onProgress = null) {
   return new Promise((resolve, reject) => {
@@ -148,19 +215,36 @@ function httpsGetWithRedirects(url, headers = {}, onProgress = null) {
         return reject(new Error('Too many redirects while accessing ' + currentUrl));
       }
 
-      const token = getAuthToken();
-      const reqHeaders = Object.assign({
-        'User-Agent': 'Bubu-Dudu-Pet-AutoUpdater',
-        'Accept': 'application/vnd.github.v3+json'
-      }, headers);
-
-      if (token && !reqHeaders['Authorization']) {
-        reqHeaders['Authorization'] = `token ${token}`;
+      let uObj;
+      try {
+        uObj = new URL(currentUrl);
+      } catch (e) {
+        return reject(new Error('Invalid URL: ' + currentUrl));
       }
 
-      const req = https.get(currentUrl, { headers: reqHeaders }, (res) => {
+      const token = getAuthToken();
+      const isGitHub = uObj.hostname.endsWith('github.com');
+
+      const reqHeaders = Object.assign({
+        'User-Agent': 'Bubu-Dudu-Pet-AutoUpdater',
+      }, headers);
+
+      if (!reqHeaders['Accept']) {
+        reqHeaders['Accept'] = 'application/vnd.github.v3+json';
+      }
+
+      // Only attach Authorization header to *.github.com domains (never forward to S3 or third-party storage)
+      if (isGitHub && token && !reqHeaders['Authorization']) {
+        reqHeaders['Authorization'] = `token ${token}`;
+      } else if (!isGitHub) {
+        delete reqHeaders['Authorization'];
+      }
+
+      const client = uObj.protocol === 'http:' ? http : https;
+      const req = client.get(currentUrl, { headers: reqHeaders }, (res) => {
         if (res.statusCode >= 300 && res.statusCode < 400 && res.headers.location) {
-          return request(res.headers.location, redirectCount + 1);
+          const nextUrl = new URL(res.headers.location, currentUrl).toString();
+          return request(nextUrl, redirectCount + 1);
         }
 
         if (res.statusCode !== 200) {
@@ -187,24 +271,34 @@ function httpsGetWithRedirects(url, headers = {}, onProgress = null) {
 /**
  * Downloads a remote URL to a local destination file.
  */
-async function downloadFile(url, destPath, onProgress = null) {
-  const res = await httpsGetWithRedirects(url, {}, onProgress);
+async function downloadFile(url, destPath, headers = {}, onProgress = null) {
+  let finalHeaders = headers;
+  let finalProgress = onProgress;
+  if (typeof headers === 'function') {
+    finalProgress = headers;
+    finalHeaders = {};
+  }
+
+  const res = await httpsGetWithRedirects(url, finalHeaders);
   const totalBytes = parseInt(res.headers['content-length'], 10) || 0;
   let downloadedBytes = 0;
 
   return new Promise((resolve, reject) => {
+    const dir = path.dirname(destPath);
+    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+
     const fileStream = fs.createWriteStream(destPath);
     res.on('data', (chunk) => {
       downloadedBytes += chunk.length;
-      if (onProgress && totalBytes > 0) {
-        onProgress(downloadedBytes / totalBytes, downloadedBytes, totalBytes);
+      if (finalProgress && totalBytes > 0) {
+        finalProgress(downloadedBytes / totalBytes, downloadedBytes, totalBytes);
       }
     });
 
     res.pipe(fileStream);
 
     fileStream.on('finish', () => {
-      fileStream.close(() => resolve(destPath));
+      fileStream.close(() => resolve({ path: destPath, totalBytes: downloadedBytes }));
     });
 
     fileStream.on('error', (err) => {
@@ -289,13 +383,27 @@ async function checkForUpdates(options = {}) {
     });
 
     if (!options.silent && isElectron && dialog) {
-      dialog.showMessageBox({
-        type: 'warning',
-        title: 'Bubu & Dudu Pet Update',
-        message: 'ไม่สามารถตรวจสอบการอัปเดตได้ในขณะนี้',
-        detail: `ข้อผิดพลาด: ${err.message}\n(ตรวจสอบการเชื่อมต่ออินเทอร์เน็ต หรือลองใหม่อีกครั้งในภายหลัง)`,
-        buttons: ['ตกลง']
-      });
+      const isAuthError = err.statusCode === 404 || err.statusCode === 401 || (err.message && (err.message.includes('404') || err.message.includes('401')));
+      if (isAuthError && !getAuthToken()) {
+        const choice = await dialog.showMessageBox({
+          type: 'warning',
+          title: 'Bubu & Dudu Pet - GitHub Update',
+          message: 'Repository นี้เป็นแบบส่วนตัว (Private)',
+          detail: 'ไม่สามารถเข้าถึง GitHub Release ได้เนื่องจากยังไม่ได้ระบุ GitHub Token หรือ Token หมดอายุ\n\nต้องการตั้งค่า GitHub Token ตอนนี้หรือไม่?',
+          buttons: ['ตั้งค่า Token 🔑', 'ไว้ภายหลัง']
+        });
+        if (choice.response === 0) {
+          await promptTokenConfigDialog();
+        }
+      } else {
+        dialog.showMessageBox({
+          type: 'warning',
+          title: 'Bubu & Dudu Pet Update',
+          message: 'ไม่สามารถตรวจสอบการอัปเดตได้ในขณะนี้',
+          detail: `ข้อผิดพลาด: ${err.message}\n(ตรวจสอบการเชื่อมต่ออินเทอร์เน็ต หรือลองใหม่อีกครั้งในภายหลัง)`,
+          buttons: ['ตกลง']
+        });
+      }
     }
 
     return { hasUpdate: false, error: err.message };
@@ -322,10 +430,8 @@ async function promptUpdateDialog(release, currentVersion) {
   });
 
   if (result.response === 0) {
-    // Download & Install
     await performDownloadAndInstall(release);
   } else if (result.response === 1) {
-    // Open Release in Browser
     if (shell && release.html_url) {
       shell.openExternal(release.html_url);
     }
@@ -333,39 +439,81 @@ async function promptUpdateDialog(release, currentVersion) {
 }
 
 /**
- * Downloads matching asset and executes or reveals it.
+ * Dialog to view or configure GitHub Personal Access Token.
  */
-async function performDownloadAndInstall(release) {
+async function promptTokenConfigDialog() {
+  if (!dialog) return;
+
+  const currentToken = getAuthToken();
+  const masked = currentToken ? (currentToken.slice(0, 7) + '...' + currentToken.slice(-4)) : 'ยังไม่ได้ตั้งค่า';
+
+  const res = await dialog.showMessageBox({
+    type: 'info',
+    title: 'ตั้งค่า GitHub Token สำหรับ Auto-Update 🔑',
+    message: `สถานะ Token ปัจจุบัน: ${masked}`,
+    detail: `ระบบรองรับการอ่าน Token อัตโนมัติจาก:\n1. ไฟล์ updater.config.json\n2. ตัวแปรสภาพแวดล้อม GITHUB_TOKEN\n\nต้องการเปิดโฟลเดอร์ตั้งค่าเพื่อตรวจสอบ/แก้ไขไฟล์ updater.config.json หรือไม่?`,
+    buttons: ['เปิดโฟลเดอร์ตั้งค่า 📁', 'เปิดหน้าสร้าง Token บน GitHub 🌐', 'ปิด']
+  });
+
+  if (res.response === 0) {
+    const configPath = (isElectron && app && typeof app.getPath === 'function')
+      ? path.join(app.getPath('userData'), 'updater.config.json')
+      : path.join(__dirname, '..', 'updater.config.json');
+
+    if (!fs.existsSync(configPath)) {
+      saveAuthToken(currentToken || '', getRepoIdentifier());
+    }
+
+    if (shell) {
+      shell.showItemInFolder(configPath);
+    }
+  } else if (res.response === 1) {
+    if (shell) {
+      shell.openExternal('https://github.com/settings/tokens/new?scopes=repo&description=BubuDuduPetAutoUpdate');
+    }
+  }
+}
+
+/**
+ * Downloads matching asset and executes or reveals it.
+ * Uses asset.url with Accept: application/octet-stream for private repository support.
+ */
+async function performDownloadAndInstall(release, onProgress = null) {
   const asset = findPlatformAsset(release.assets);
-  if (!asset || !asset.browser_download_url) {
-    // Fallback to opening release web page
+  if (!asset) {
     if (shell && release.html_url) {
       shell.openExternal(release.html_url);
     }
-    return;
+    return { success: false, reason: 'no-platform-asset' };
+  }
+
+  const token = getAuthToken();
+  const tempDir = app ? app.getPath('temp') : require('os').tmpdir();
+  const destPath = path.join(tempDir, asset.name);
+
+  // If token is present, use asset.url with Accept: application/octet-stream
+  // (Mandatory for private repositories where browser_download_url returns 404)
+  const isPrivate = !!token;
+  const downloadUrl = (isPrivate && asset.url) ? asset.url : (asset.browser_download_url || asset.url);
+  const downloadHeaders = (isPrivate && asset.url) ? { 'Accept': 'application/octet-stream' } : {};
+
+  if (dialog) {
+    dialog.showMessageBox({
+      type: 'info',
+      title: 'กำลังดาวน์โหลดอัปเดต 📥',
+      message: `กำลังดาวน์โหลด ${asset.name}...`,
+      detail: 'ระบบกำลังดาวน์โหลดไฟล์อัปเดตในเบื้องหลัง เมื่อเสร็จสิ้นจะเปิดตัวติดตั้งให้อัตโนมัติครับ ✨',
+      buttons: ['รับทราบ']
+    });
   }
 
   try {
-    const tempDir = app ? app.getPath('temp') : require('os').tmpdir();
-    const destPath = path.join(tempDir, asset.name);
-
-    if (dialog) {
-      dialog.showMessageBox({
-        type: 'info',
-        title: 'กำลังดาวน์โหลดอัปเดต',
-        message: `กำลังเริ่มดาวน์โหลด ${asset.name}...`,
-        detail: 'ระบบกำลังดาวน์โหลดไฟล์ในเบื้องหลัง เมื่อเสร็จสิ้นจะเปิดตัวติดตั้งให้อัตโนมัติครับ',
-        buttons: ['รับทราบ']
-      });
-    }
-
-    await downloadFile(asset.browser_download_url, destPath);
+    await downloadFile(downloadUrl, destPath, downloadHeaders, onProgress);
 
     if (process.platform === 'win32') {
-      // Launch Windows installer/exe and close current app
       const confirm = await dialog.showMessageBox({
         type: 'info',
-        title: 'ดาวน์โหลดเสร็จสมบูรณ์',
+        title: 'ดาวน์โหลดเสร็จสมบูรณ์ 🎉',
         message: 'ดาวน์โหลดเวอร์ชันใหม่เสร็จแล้ว พร้อมติดตั้งทันที!',
         buttons: ['ติดตั้งและเริ่มแอปใหม่ 🚀', 'ไว้เปิดเองภายหลัง']
       });
@@ -375,33 +523,34 @@ async function performDownloadAndInstall(release) {
         if (app) app.quit();
       }
     } else if (process.platform === 'darwin') {
-      // macOS: Reveal downloaded zip/dmg in Finder
       if (shell) {
         shell.showItemInFolder(destPath);
       }
       if (dialog) {
         dialog.showMessageBox({
           type: 'info',
-          title: 'ดาวน์โหลดเสร็จสมบูรณ์',
+          title: 'ดาวน์โหลดเสร็จสมบูรณ์ 🎉',
           message: 'ดาวน์โหลดเวอร์ชันใหม่เสร็จแล้ว!',
-          detail: `ไฟล์อยู่ที่: ${destPath}\nเปิดไฟล์เพื่อแทนที่แอปในโฟลเดอร์ Applications ได้ทันที`,
+          detail: `ไฟล์อยู่ที่: ${destPath}\nเปิดไฟล์เพื่อแทนที่แอปในโฟลเดอร์ Applications ได้ทันที ✨`,
           buttons: ['ตกลง']
         });
       }
     }
+    return { success: true, path: destPath };
   } catch (err) {
     if (dialog) {
       dialog.showMessageBox({
         type: 'error',
         title: 'การดาวน์โหลดล้มเหลว',
         message: 'ไม่สามารถดาวน์โหลดไฟล์อัปเดตได้',
-        detail: err.message + '\nจะเปิดหน้าดาวน์โหลดบนเว็บแทน',
+        detail: `${err.message}\nจะเปิดหน้าดาวน์โหลด Release บนเบราว์เซอร์แทนครับ`,
         buttons: ['ตกลง']
       });
     }
     if (shell && release.html_url) {
       shell.openExternal(release.html_url);
     }
+    return { success: false, error: err.message };
   }
 }
 
@@ -440,11 +589,16 @@ module.exports = {
   semverCompare,
   isNewerVersion,
   getRepoIdentifier,
+  getAuthToken,
+  saveAuthToken,
   findPlatformAsset,
   fetchLatestRelease,
   checkForUpdates,
   promptUpdateDialog,
+  promptTokenConfigDialog,
   performDownloadAndInstall,
+  downloadFile,
+  httpsGetWithRedirects,
   onUpdateStatus,
   initAutoUpdater,
   getUpdateState: () => Object.assign({}, updateState)

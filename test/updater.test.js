@@ -92,6 +92,31 @@ describe('GitHub Auto-Updater Module Tests', () => {
     });
   });
 
+  describe('Authentication & Token Resolution', () => {
+    test('getAuthToken resolves configured token', () => {
+      const token = updater.getAuthToken();
+      assert.ok(typeof token === 'string' && token.length > 10, 'Expected non-empty auth token');
+    });
+
+    test('environment variable GITHUB_TOKEN overrides config', () => {
+      const oldToken = process.env.GITHUB_TOKEN;
+      try {
+        process.env.GITHUB_TOKEN = 'ghp_override_token_test_12345';
+        assert.strictEqual(updater.getAuthToken(), 'ghp_override_token_test_12345');
+      } finally {
+        if (oldToken) process.env.GITHUB_TOKEN = oldToken;
+        else delete process.env.GITHUB_TOKEN;
+      }
+    });
+
+    test('saveAuthToken and getAuthToken persist token safely', () => {
+      const testToken = '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';
+      const saved = updater.saveAuthToken(testToken, 'thezerodear/bubu-dudu-desktop-pet');
+      assert.strictEqual(saved, true);
+      assert.strictEqual(updater.getAuthToken(), testToken);
+    });
+  });
+
   describe('Update State and Notification Flow', () => {
     test('getUpdateState returns initial snapshot safely', () => {
       const state = updater.getUpdateState();

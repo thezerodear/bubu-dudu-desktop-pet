@@ -495,6 +495,10 @@ function updateTrayMenu() {
       label: 'ตรวจหาอัปเดต... (Check for Updates 🔄)',
       click: () => updater.checkForUpdates({ silent: false })
     },
+    {
+      label: 'ตั้งค่า GitHub Token 🔑',
+      click: () => updater.promptTokenConfigDialog()
+    },
     { type: 'separator' },
     {
       label: 'Quit Bubu & Dudu',
@@ -631,6 +635,10 @@ ipcMain.on('open-context-menu', (event, petName) => {
       label: 'Check for Updates 🔄',
       click: () => updater.checkForUpdates({ silent: false })
     },
+    {
+      label: 'GitHub Token Config 🔑',
+      click: () => updater.promptTokenConfigDialog()
+    },
     { type: 'separator' },
     {
       label: 'Quit Program',
@@ -643,6 +651,10 @@ ipcMain.on('open-context-menu', (event, petName) => {
 
 ipcMain.on('check-for-updates', () => {
   updater.checkForUpdates({ silent: false });
+});
+
+ipcMain.on('configure-token', () => {
+  updater.promptTokenConfigDialog();
 });
 }
 

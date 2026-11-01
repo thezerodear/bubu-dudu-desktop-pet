@@ -21,7 +21,7 @@ IGNORED_DIRS = {
     "tools/cache", "tools/frames", "__pycache__", "test/fixtures"
 }
 IGNORED_EXTENSIONS = {".log", ".tmp"}
-IGNORED_FILES = {".DS_Store", "Thumbs.db", "Desktop.ini"}
+IGNORED_FILES = {".DS_Store", "Thumbs.db", "Desktop.ini", "updater.config.json", ".env", ".env.local"}
 
 def should_ignore(rel_path):
     rel_path_fwd = rel_path.replace("\\", "/")
@@ -202,7 +202,7 @@ def deploy_to_github(token, repo_name="bubu-dudu-desktop-pet", is_private=True, 
             print(f"Created release {version_tag}: {release_data['html_url']}")
 
         upload_url_template = release_data.get("upload_url", "").split("{")[0]
-        existing_assets = {a["name"]: a["id"] for a in release_data.get("assets", [])}
+        existing_assets = {a["name"]: a for a in release_data.get("assets", [])}
 
         dist_files = [f for f in os.listdir(DIST_DIR) if "1.0.2" in f and not f.endswith(".blockmap")]
         for df in dist_files:
@@ -210,12 +210,18 @@ def deploy_to_github(token, repo_name="bubu-dudu-desktop-pet", is_private=True, 
             if not os.path.isfile(file_path):
                 continue
 
-            # If asset already uploaded, delete old one first
+            local_size = os.path.getsize(file_path)
+            # If asset already uploaded with matching size, skip re-upload
             if df in existing_assets:
-                print(f"Removing prior asset {df}...")
-                make_request(f"{repo_url}/releases/assets/{existing_assets[df]}", method="DELETE", token=token)
+                remote_size = existing_assets[df].get("size", 0)
+                if remote_size == local_size:
+                    print(f"Asset {df} ({local_size / 1024 / 1024:.1f} MB) already up to date in release, skipping.")
+                    continue
+                else:
+                    print(f"Removing prior asset {df} (size mismatch)...")
+                    make_request(f"{repo_url}/releases/assets/{existing_assets[df]['id']}", method="DELETE", token=token)
 
-            print(f"Uploading asset {df} ({os.path.getsize(file_path) / 1024 / 1024:.1f} MB)...", flush=True)
+            print(f"Uploading asset {df} ({local_size / 1024 / 1024:.1f} MB)...", flush=True)
             with open(file_path, "rb") as f:
                 asset_bytes = f.read()
 

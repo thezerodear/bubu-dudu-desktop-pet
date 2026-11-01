@@ -37,7 +37,8 @@
       "*.gif",
       "tray-icon.png",
       "app-icon.png",
-      "package.json"
+      "package.json",
+      "updater.config.json"
     ],
     "win": {
       "target": [

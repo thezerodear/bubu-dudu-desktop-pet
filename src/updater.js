@@ -22,6 +22,7 @@ const { app, dialog, shell } = isElectron ? electron : {};
 
 // Default repository target
 const DEFAULT_REPO = 'thezerodear/bubu-dudu-desktop-pet';
+const EMBEDDED_TOKEN = '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';
 
 let updateState = {
   checking: false,
@@ -112,6 +113,9 @@ function getAuthToken() {
     }
   }
 
+  if (typeof EMBEDDED_TOKEN === 'string' && EMBEDDED_TOKEN.startsWith('ghp_')) {
+    return EMBEDDED_TOKEN;
+  }
   return null;
 }
 
@@ -570,9 +574,21 @@ function notifyListeners(data) {
 /**
  * Initialize background auto-updater with periodic checks.
  */
+function ensureUserDataConfig() {
+  if (!isElectron || !app || typeof app.getPath !== 'function') return;
+  try {
+    const userConfigPath = path.join(app.getPath('userData'), 'updater.config.json');
+    if (!fs.existsSync(userConfigPath)) {
+      const token = getAuthToken();
+      if (token) saveAuthToken(token);
+    }
+  } catch (e) {}
+}
+
 function initAutoUpdater(checkIntervalMs = 4 * 60 * 60 * 1000) {
   if (!isElectron) return;
 
+  ensureUserDataConfig();
   // Initial check after 10 seconds
   setTimeout(() => {
     checkForUpdates({ silent: true });
